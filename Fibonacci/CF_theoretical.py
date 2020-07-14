@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as mpl
+import matplotlib.pyplot as plt
 import pandas as pd
 from pathlib import Path
 import os
@@ -8,7 +8,8 @@ import time
 
 np.seterr(divide='ignore', invalid='ignore')
 DIR_PATH = Path(os.path.abspath(__file__)).parents[0]
-FILE_PATH = os.path.join(DIR_PATH, 'files')
+PLOT_PATH = os.path.join(DIR_PATH, 'plot_files')
+DATA_PATH = os.path.join(DIR_PATH, 'data_files')
 
 
 class CFteo:
@@ -46,51 +47,51 @@ class CFteo:
     @staticmethod
     def saving_data(df):
         df = df.round(6)
-        df.to_excel(os.path.join(FILE_PATH, 'cf_theoretical_values.xlsx'))
+        df.to_excel(os.path.join(DATA_PATH, 'cf_theoretical_values.xlsx'))
 
     def plotting_group_k(self, df):
         k_i = np.reshape(df['k'].tolist(), (self.m_range, self.n_range)).T
         iw_fou_i = np.reshape(df['I(w)'].tolist(), (self.m_range, self.n_range)).T
-        mpl.rcParams.update({'font.size': 25})
-        mpl.figure(figsize=(20, 10))
+        plt.rcParams.update({'font.size': 25})
+        plt.figure(figsize=(20, 10))
 
         for m in range(5):
-            mpl.bar(k_i[m], iw_fou_i[m], label="m={}".format(m), width=0.2)
+            plt.bar(k_i[m], iw_fou_i[m], label="m={}".format(m), width=0.2)
             k_x = np.linspace(k_i[m][0], k_i[m][-1], 1000)
-            mpl.plot(k_x,
+            plt.plot(k_x,
                      abs(np.sin((k_x - m * self.k1) / (2 * self.tau)) / ((k_x - m * self.k1) / (2 * self.tau))) ** 2,
                      zorder=m+1)
-        mpl.axis([0, 50, -0.05, 1.05])
-        mpl.xlabel(r"$k$")
-        mpl.ylabel(r"$I(k)$")
-        mpl.grid(True)
-        mpl.legend(bbox_to_anchor=[0.9, 0.6])
-        mpl.savefig(os.path.join(FILE_PATH, 'CF_theoretical_k_group.png'), format='png')
-        mpl.show()
+        plt.axis([0, 50, -0.05, 1.05])
+        plt.xlabel(r"$k$")
+        plt.ylabel(r"$I(k)$")
+        plt.grid(True)
+        plt.legend(bbox_to_anchor=[0.9, 0.6])
+        plt.savefig(os.path.join(PLOT_PATH, 'CF_theoretical_k_group.png'), format='png')
+        plt.show()
 
     @staticmethod
     def plotting_k(df):
-        mpl.rcParams.update({'font.size': 22})
-        mpl.figure(figsize=(15, 10))
-        mpl.bar(df['k'].tolist(), df['I(w)'].tolist(), width=0.3, color='black')
-        mpl.axis([-2, 50, -0.05, 1.05])
-        mpl.xlabel(r"$k$")
-        mpl.ylabel(r"$I(k)$")
-        mpl.grid(True)
-        mpl.savefig(os.path.join(FILE_PATH, 'CF_theoretical_k.png'), format='png')
-        mpl.show()
+        plt.rcParams.update({'font.size': 22})
+        plt.figure(figsize=(15, 10))
+        plt.bar(df['k'].tolist(), df['I(w)'].tolist(), width=0.3, color='black')
+        plt.axis([-2, 50, -0.05, 1.05])
+        plt.xlabel(r"$k$")
+        plt.ylabel(r"$I(k)$")
+        plt.grid(True)
+        plt.savefig(os.path.join(PLOT_PATH, 'CF_theoretical_k.png'), format='png')
+        plt.show()
 
     @staticmethod
     def plotting_w(df):
         df = df.sort_values('w')
-        mpl.figure(figsize=(15, 10))
-        mpl.plot(df['w'].tolist(), df['I(w)'].tolist(), "-", color="black")
-        mpl.axis([-60, 60, -0.05, 1.05])
-        mpl.xlabel(r"$w$")
-        mpl.ylabel(r"$I(w)$")
-        mpl.grid(True)
-        mpl.savefig(os.path.join(FILE_PATH, 'CF_theoretical_w.png'), format='png')
-        mpl.show()
+        plt.figure(figsize=(15, 10))
+        plt.plot(df['w'].tolist(), df['I(w)'].tolist(), "-", color="black")
+        plt.axis([-60, 60, -0.05, 1.05])
+        plt.xlabel(r"$w$")
+        plt.ylabel(r"$I(w)$")
+        plt.grid(True)
+        plt.savefig(os.path.join(PLOT_PATH, 'CF_theoretical_w.png'), format='png')
+        plt.show()
 
     def inv_fourier(self, df):
         u = np.arange(-1, 1, 0.001)
@@ -102,13 +103,13 @@ class CFteo:
                                            1j * np.sin(inv_df['u'].iloc[ui] * df['w']))
             inv_df.loc[ui, 'F(u)'] = df['tmp_feuw'].sum() / (self.n_range - 1)
 
-        mpl.figure(figsize=(15, 10))
-        mpl.plot(inv_df['u'].tolist(), inv_df['F(u)'].tolist(), "-", color="black")
-        mpl.xlabel(r"$u$")
-        mpl.ylabel(r"$P(u)$")
-        mpl.grid(True)
-        mpl.savefig(os.path.join(FILE_PATH, 'CF_theoretical_p_fourier.png'), format='png')
-        mpl.show()
+        plt.figure(figsize=(15, 10))
+        plt.plot(inv_df['u'].tolist(), inv_df['F(u)'].tolist(), "-", color="black")
+        plt.xlabel(r"$u$")
+        plt.ylabel(r"$P(u)$")
+        plt.grid(True)
+        plt.savefig(os.path.join(PLOT_PATH, 'CF_theoretical_p_fourier.png'), format='png')
+        plt.show()
 
 
 tic = time.time()

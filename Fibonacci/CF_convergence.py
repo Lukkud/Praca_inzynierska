@@ -5,7 +5,8 @@ import os
 
 
 DIR_PATH = Path(os.path.abspath(__file__)).parents[0]
-FILE_PATH = os.path.join(DIR_PATH, 'files')
+PLOT_PATH = os.path.join(DIR_PATH, 'plot_files')
+DATA_PATH = os.path.join(DIR_PATH, 'data_files')
 
 tau = (1 + np.sqrt(5)) * 0.5
 num, fibo = [], "L"
@@ -25,5 +26,5 @@ plt.ylabel(r"$\frac{\upsilon_{L}}{\upsilon_{S}}$")
 plt.xticks(np.arange(2, 22, 2))
 plt.grid(True)
 plt.legend()
-plt.savefig(os.path.join(FILE_PATH, 'fibo_convergence.png'), format='png')
+plt.savefig(os.path.join(PLOT_PATH, 'CF_convergence.png'), format='png')
 plt.show()

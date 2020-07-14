@@ -5,7 +5,8 @@ import os
 
 
 DIR_PATH = Path(os.path.abspath(__file__)).parents[0]
-FILE_PATH = os.path.join(DIR_PATH, 'files')
+PLOT_PATH = os.path.join(DIR_PATH, 'plot_files')
+DATA_PATH = os.path.join(DIR_PATH, 'data_files')
 
 
 def cf_transform(atoms):
@@ -24,8 +25,8 @@ def cf_transform(atoms):
         count_l.append(fibo[:i].count('L'))
         count_s.append(fibo[:i].count('S'))
         num_fibo.append(round(count_l[-1] * tau + count_s[-1], 6))
-    df = pd.DataFrame({'Fibonacci string': num_fibo})
-    df.to_csv(os.path.join(FILE_PATH, 'fibo_transform.csv'))
+    df = pd.DataFrame({'string': num_fibo})
+    df.to_csv(os.path.join(DATA_PATH, 'fibo_transform.csv'))
 
 
 def cf_projection(length):
@@ -48,5 +49,5 @@ def cf_projection(length):
         for i in range(length):
             if (surface[i] >= border_down[j]) and (surface[i] <= border_up[j]):
                 num_fibo.append(round((surface[i] - border_down[j]) * np.sin(alpha) + j * A / np.cos(alpha) - 1, 6))
-    df = pd.DataFrame({'Fibonacci string': num_fibo[1:]})
-    df.to_csv(os.path.join(FILE_PATH, 'fibo_projection.csv'))
+    df = pd.DataFrame({'string': num_fibo[1:]})
+    df.to_csv(os.path.join(DATA_PATH, 'fibo_projection.csv'))
