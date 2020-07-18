@@ -84,6 +84,7 @@ class CFteo:
     @staticmethod
     def plotting_w(df):
         df = df.sort_values('w')
+        plt.rcParams.update({'font.size': 22})
         plt.figure(figsize=(15, 10))
         plt.plot(df['w'].tolist(), df['I(w)'].tolist(), "-", color="black")
         plt.axis([-60, 60, -0.05, 1.05])
@@ -103,6 +104,7 @@ class CFteo:
                                            1j * np.sin(inv_df['u'].iloc[ui] * df['w']))
             inv_df.loc[ui, 'F(u)'] = df['tmp_feuw'].sum() / (self.n_range - 1)
 
+        plt.rcParams.update({'font.size': 22})
         plt.figure(figsize=(15, 10))
         plt.plot(inv_df['u'].tolist(), inv_df['F(u)'].tolist(), "-", color="black")
         plt.xlabel(r"$u$")
@@ -113,7 +115,7 @@ class CFteo:
 
 
 tic = time.time()
-x = CFteo(50, 50, 1, (1, 1, 1), 1)
+x = CFteo(100, 100, 0, (0, 0, 0), 1)
 x.scheduler()
 toc = time.time()
 print(toc - tic)

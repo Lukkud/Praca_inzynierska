@@ -60,6 +60,5 @@ class CFteo_stat:
 
 tic = time.time()
 x = CFteo_stat(50000, 1, 250)
-# x.calculating()
 toc = time.time()
 print(toc - tic)
