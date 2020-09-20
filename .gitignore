@@ -129,3 +129,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Output files
+Fibonacci.data_files/
+Fibonacci.plot_files/
+.Fibonacci.data_files
+.Fibonacci.plot_files
