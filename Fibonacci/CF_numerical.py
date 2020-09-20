@@ -8,7 +8,6 @@ import time
 from CF_generator import cf_transform, cf_projection
 from numba import jit
 
-
 DIR_PATH = Path(os.path.abspath(__file__)).parents[0]
 PLOT_PATH = os.path.join(DIR_PATH, 'plot_files')
 DATA_PATH = os.path.join(DIR_PATH, 'data_files')
@@ -42,25 +41,28 @@ class CFnum:
         self.df_k = pd.DataFrame({'k': np.arange(0, 100, self.step), 'fourier': np.nan, 'int_fourier': np.nan})
         self.df_k['fourier'] = self.fourier(self.df_k['k'].values, self.fibonacci_str['string'].values)
         self.df_k['int_fourier'] = np.absolute(self.df_k['fourier']) ** 2
-        CFnum.saving_data_k(self.df_k)
+        CFnum.saving_data(self.df_k, 'cf_numerical_k_data.xlsx')
         CFnum.plotting_k(self.df_k)
+
+        print('Comparing models')
+        self.compare()
 
         print('Preparing w part')
         self.tictoc.append(time.time())
         self.df_w = self.prepare_w(self.df_k)
-        CFnum.saving_data_w(self.df_w)
+        CFnum.saving_data(self.df_w, 'cf_numerical_w_data.xlsx')
         CFnum.plotting_w(self.df_w)
 
         print('Preparing p part')
         self.tictoc.append(time.time())
         self.df_p = self.inv_fourier()
-        CFnum.saving_data_p(self.df_p)
+        CFnum.saving_data(self.df_p, 'cf_numerical_p_data.xlsx')
         CFnum.plotting_p(self.df_p)
         self.tictoc.append(time.time())
         print('Done')
-        print('Time first (k) part: ', self.tictoc[1] - self.tictoc[0])
-        print('Time second (w) part: ', self.tictoc[2] - self.tictoc[1])
-        print('Time third (p) part: ', self.tictoc[3] - self.tictoc[2])
+        print('Time first (k) part: ', round(self.tictoc[1] - self.tictoc[0], 2))
+        print('Time second (w) part: ', round(self.tictoc[2] - self.tictoc[1], 2))
+        print('Time third (p) part: ', round(self.tictoc[3] - self.tictoc[2], 2))
 
     @staticmethod
     @jit(nopython=True)
@@ -96,19 +98,9 @@ class CFnum:
         return inv_df
 
     @staticmethod
-    def saving_data_k(df):
+    def saving_data(df, file_name):
         df = df.round(6)
-        df.to_excel(os.path.join(DATA_PATH, 'cf_numerical_k_data.xlsx'), index=False)
-
-    @staticmethod
-    def saving_data_w(df):
-        df = df.round(6)
-        df.to_excel(os.path.join(DATA_PATH, 'cf_numerical_w_data.xlsx'), index=False)
-
-    @staticmethod
-    def saving_data_p(df):
-        df = df.round(6)
-        df.to_excel(os.path.join(DATA_PATH, 'cf_numerical_p_data.xlsx'), index=False)
+        df.to_excel(os.path.join(DATA_PATH, file_name), index=False)
 
     @staticmethod
     def plotting_k(df):
@@ -147,8 +139,46 @@ class CFnum:
         plt.savefig(os.path.join(PLOT_PATH, 'CF_numerical_p.png'), format='png')
         plt.show()
 
+    def compare(self):
+        df = self.df_k
+        k_tmp = np.array([n * self.k0 + m * self.q0 for n in range(self.n_range) for m in range(self.m_range)])
+        iw_fou_num, iw_fou_teo = [], []
+        for i in range(1, len(k_tmp)):
+            if k_tmp[i] < 100:
+                df['tmp_k'] = abs(df['k'] - k_tmp[i])
+                n, m = i // self.n_range, i % self.n_range
+                iw_fou_num.append(df['int_fourier'].loc[df['tmp_k'].idxmin()])
+                X = self.k0 * (n - m * self.tau) / (2 * self.tau)
+                iw_fou_teo.append(abs(np.sin(X) / X) ** 2)
+
+        iw_fou_teo, iw_fou_num = np.array(iw_fou_teo[1:]), np.array(iw_fou_num[1:])
+        print("R:", 100 * abs(iw_fou_teo - iw_fou_num).sum() / sum(iw_fou_teo))
+
+        plt.rcParams.update({'font.size': 22})
+        plt.figure(figsize=(10, 10))
+        plt.plot(iw_fou_teo, iw_fou_teo, '-', color='red', zorder=1)
+        plt.plot(iw_fou_teo, iw_fou_num, 'o', ms=3, color='black', zorder=2)
+        plt.xlabel(r"$I(k)_{teo}$")
+        plt.ylabel(r"$I(k)_{num}$")
+        plt.grid(True)
+        plt.savefig(os.path.join(PLOT_PATH, 'CF_numerical_compare.png'), format='png')
+        plt.show()
+
+        plt.rcParams.update({'font.size': 22})
+        plt.figure(figsize=(10, 10))
+        plt.plot(iw_fou_teo, iw_fou_teo, '-', color='red', zorder=1)
+        plt.plot(iw_fou_teo, iw_fou_num, 'o', ms=3, color='black', zorder=2)
+        plt.xlabel(r"$I(k)_{teo}$")
+        plt.ylabel(r"$I(k)_{num}$")
+        plt.axis([10e-7, 1, 10e-7, 1])
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.grid(True)
+        plt.savefig(os.path.join(PLOT_PATH, 'CF_numerical_compare_log.png'), format='png')
+        plt.show()
+
 
 tic = time.time()
 x = CFnum(500, 1, 0.0001, 0.00005, (30, 30))
 toc = time.time()
-print('Time: ', toc - tic)
+print('Overall time: ', round(toc - tic, 2))
