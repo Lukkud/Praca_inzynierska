@@ -131,7 +131,7 @@ dmypy.json
 .pyre/
 
 # Output files
-Fibonacci.data_files/
-Fibonacci.plot_files/
+Fibonacci/plot_files
+Fibonacci/data_files
 .Fibonacci.data_files
 .Fibonacci.plot_files
