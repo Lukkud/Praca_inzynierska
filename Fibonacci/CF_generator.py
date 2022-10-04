@@ -5,8 +5,8 @@ import os
 
 
 DIR_PATH = Path(os.path.abspath(__file__)).parents[0]
-PLOT_PATH = os.path.join(DIR_PATH, 'plot_files')
 DATA_PATH = os.path.join(DIR_PATH, 'data_files')
+Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
 
 
 def cf_transform(atoms):
@@ -18,15 +18,15 @@ def cf_transform(atoms):
     tau = (1 + np.sqrt(5)) * 0.5
     num_fibo, count_l, count_s, fibo = [], [], [], "S"
     while len(fibo) <= atoms:
-        fibo = ''.join([j.replace('S', 'A') for j in fibo])
-        fibo = ''.join([j.replace('L', 'LS') for j in fibo])
-        fibo = ''.join([j.replace('A', 'L') for j in fibo])
+        fibo = fibo.replace('S', 'A')
+        fibo = fibo.replace('L', 'LS')
+        fibo = fibo.replace('A', 'L')
     for i in range(atoms):
         count_l.append(fibo[:i].count('L'))
         count_s.append(fibo[:i].count('S'))
         num_fibo.append(round(count_l[-1] * tau + count_s[-1], 6))
     df = pd.DataFrame({'string': num_fibo})
-    df.to_csv(os.path.join(DATA_PATH, 'fibo_transform.csv'))
+    return df
 
 
 def cf_projection(length):
@@ -34,7 +34,7 @@ def cf_projection(length):
     structure described in cartesian coordinates. The idea is to choose part of this structure and project every atom
     from it on a new base. The new x axis is given by axis of our section. For very specific section tilt angle (alpha)
     and distance between adjoining atoms (A) it is possible to get fibonacci chain like in first method. Both methods
-    are correct More about this idea you can read in my engineer's thesis in chapter 'Metoda generacji ciągu
+    are correct. More about this idea you can read in my engineer's thesis in chapter 'Metoda generacji ciągu
     Fibonacciego za pomocą rzutowania'."""
 
     tau = (1 + np.sqrt(5)) * 0.5
