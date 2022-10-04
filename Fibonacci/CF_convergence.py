@@ -6,14 +6,14 @@ import os
 
 DIR_PATH = Path(os.path.abspath(__file__)).parents[0]
 PLOT_PATH = os.path.join(DIR_PATH, 'plot_files')
-DATA_PATH = os.path.join(DIR_PATH, 'data_files')
+Path(PLOT_PATH).mkdir(parents=True, exist_ok=True)
 
 tau = (1 + np.sqrt(5)) * 0.5
 num, fibo = [], "L"
 for i in range(25):
-    fibo = ''.join([j.replace('S', 'A') for j in fibo])
-    fibo = ''.join([j.replace('L', 'LS') for j in fibo])
-    fibo = ''.join([j.replace('A', 'L') for j in fibo])
+    fibo = fibo.replace('S', 'A')
+    fibo = fibo.replace('L', 'LS')
+    fibo = fibo.replace('A', 'L')
     num.append(fibo.count('L')/fibo.count('S'))
 
 plt.rcParams.update({'font.size': 20})
