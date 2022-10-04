@@ -1,19 +1,20 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-from pathlib import Path
 import os
 import sys
+import numpy as np
+import pandas as pd
+from pathlib import Path
 import time
 from CF_generator import cf_transform, cf_projection
+from CF_utils import CFutils
 from numba import jit
 
+
 DIR_PATH = Path(os.path.abspath(__file__)).parents[0]
-PLOT_PATH = os.path.join(DIR_PATH, 'plot_files')
 DATA_PATH = os.path.join(DIR_PATH, 'data_files')
+Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
 
 
-class CFnum:
+class CFnum(CFutils):
     def __init__(self, at, func, step, eps, tup_range):
         self.at = at
         self.tau = (1 + np.sqrt(5)) * 0.5
@@ -27,11 +28,11 @@ class CFnum:
         self.tictoc = []
 
         if func == 1:
-            cf_transform(self.at)
-            self.fibonacci_str = pd.read_csv(os.path.join(DATA_PATH, 'fibo_transform.csv'), index_col=0)
+            self.fibonacci_str = cf_transform(self.at)
+            self.fibonacci_str.to_csv(os.path.join(DATA_PATH, 'fibo_transform.csv'))
         elif func == 2:
-            cf_projection(self.at)
-            self.fibonacci_str = pd.read_csv(os.path.join(DATA_PATH, 'fibo_projection.csv'), index_col=0)
+            self.fibonacci_str = cf_projection(self.at)
+            self.fibonacci_str.to_csv(os.path.join(DATA_PATH, 'fibo_projection.csv'))
         else:
             print('Choose 1 to use cf_transform or 2 to use cf_projection')
             sys.exit(0)
@@ -39,10 +40,12 @@ class CFnum:
         print('Preparing k part')
         self.tictoc.append(time.time())
         self.df_k = pd.DataFrame({'k': np.arange(0, 100, self.step), 'fourier': np.nan, 'int_fourier': np.nan})
+        # Much slower solution
+        # self.df_k['fourier'] = self.df_k.apply(lambda row: np.sum([complex(np.cos(row['k'] * x), np.sin(row['k'] * x)) for x in self.fibonacci_str['string']]), axis=1)
         self.df_k['fourier'] = self.fourier(self.df_k['k'].values, self.fibonacci_str['string'].values)
         self.df_k['int_fourier'] = np.absolute(self.df_k['fourier']) ** 2
-        CFnum.saving_data(self.df_k, 'cf_numerical_k_data.xlsx')
-        CFnum.plotting_k(self.df_k)
+        self.saving_data(self.df_k, 'cf_numerical_k_data.xlsx')
+        self.plotting_k(self.df_k)
 
         print('Comparing models')
         self.compare()
@@ -82,7 +85,8 @@ class CFnum:
             df_teo['tmp'] = abs(df_teo['k'] - rows.k)
             if df_teo['tmp'].min() < self.eps:
                 lst_df_teo = df_teo[df_teo.tmp == df_teo.tmp.min()].values[0][1:3]
-                df_w = df_w.append(pd.Series(list(lst_df_teo) + [rows.k, rows.k - lst_df_teo[1] * self.k1, rows.fourier, rows.int_fourier], index=df_w.columns), ignore_index=True)
+                # print(pd.Series(list(lst_df_teo) + [rows.k, rows.k - lst_df_teo[1] * self.k1, rows.fourier, rows.int_fourier], index=df_w.columns).to_frame().T)
+                df_w = pd.concat([df_w, pd.Series(list(lst_df_teo) + [rows.k, rows.k - lst_df_teo[1] * self.k1, rows.fourier, rows.int_fourier], index=df_w.columns).to_frame().T], ignore_index=True)
         df_w = df_w.astype({'n': int, 'm': int, 'k': float, 'w': float, 'int_fourier': float})
         return df_w
 
@@ -96,48 +100,6 @@ class CFnum:
                                                             1j * np.sin(inv_df['u'].iloc[ui] * self.df_w['w']))
             inv_df.loc[ui, 'inv_fourier'] = self.df_w['tmp_prob'].sum()
         return inv_df
-
-    @staticmethod
-    def saving_data(df, file_name):
-        df = df.round(6)
-        df.to_excel(os.path.join(DATA_PATH, file_name), index=False)
-
-    @staticmethod
-    def plotting_k(df):
-        plt.rcParams.update({'font.size': 22})
-        plt.figure(figsize=(15, 10))
-        plt.bar(df['k'].loc[df['int_fourier'] > 0.001], df['int_fourier'].loc[df['int_fourier'] > 0.001], color="black",
-                width=0.3)
-        plt.axis([-2, 50, -0.05, 1.05])
-        plt.xlabel(r"$k$")
-        plt.ylabel(r"$I(k)$")
-        plt.grid(True)
-        plt.savefig(os.path.join(PLOT_PATH, 'CF_numerical_k.png'), format='png')
-        plt.show()
-
-    @staticmethod
-    def plotting_w(df):
-        df = df.sort_values(by='w')
-        plt.rcParams.update({'font.size': 22})
-        plt.figure(figsize=(15, 10))
-        plt.plot(df['w'], df['int_fourier'], "-", color="black", linewidth=3)
-        plt.axis([-60, 60, -0.05, 1.05])
-        plt.xlabel(r"$w$")
-        plt.ylabel(r"$I(w)$")
-        plt.grid(True)
-        plt.savefig(os.path.join(PLOT_PATH, 'CF_numerical_w.png'), format='png')
-        plt.show()
-
-    @staticmethod
-    def plotting_p(df):
-        plt.rcParams.update({'font.size': 22})
-        plt.figure(figsize=(15, 10))
-        plt.plot(df['u'], df['inv_fourier'], "-", color="black", linewidth=3)
-        plt.xlabel(r"$u$")
-        plt.ylabel(r"$P(u)$")
-        plt.grid(True)
-        plt.savefig(os.path.join(PLOT_PATH, 'CF_numerical_p.png'), format='png')
-        plt.show()
 
     def compare(self):
         df = self.df_k
@@ -153,32 +115,10 @@ class CFnum:
 
         iw_fou_teo, iw_fou_num = np.array(iw_fou_teo[1:]), np.array(iw_fou_num[1:])
         print("R:", 100 * abs(iw_fou_teo - iw_fou_num).sum() / sum(iw_fou_teo))
-
-        plt.rcParams.update({'font.size': 22})
-        plt.figure(figsize=(10, 10))
-        plt.plot(iw_fou_teo, iw_fou_teo, '-', color='red', zorder=1)
-        plt.plot(iw_fou_teo, iw_fou_num, 'o', ms=3, color='black', zorder=2)
-        plt.xlabel(r"$I(k)_{teo}$")
-        plt.ylabel(r"$I(k)_{num}$")
-        plt.grid(True)
-        plt.savefig(os.path.join(PLOT_PATH, 'CF_numerical_compare.png'), format='png')
-        plt.show()
-
-        plt.rcParams.update({'font.size': 22})
-        plt.figure(figsize=(10, 10))
-        plt.plot(iw_fou_teo, iw_fou_teo, '-', color='red', zorder=1)
-        plt.plot(iw_fou_teo, iw_fou_num, 'o', ms=3, color='black', zorder=2)
-        plt.xlabel(r"$I(k)_{teo}$")
-        plt.ylabel(r"$I(k)_{num}$")
-        plt.axis([10e-7, 1, 10e-7, 1])
-        plt.xscale('log')
-        plt.yscale('log')
-        plt.grid(True)
-        plt.savefig(os.path.join(PLOT_PATH, 'CF_numerical_compare_log.png'), format='png')
-        plt.show()
+        self.compare_plots(iw_fou_teo, iw_fou_num)
 
 
 tic = time.time()
-x = CFnum(500, 1, 0.0001, 0.00005, (30, 30))
+x = CFnum(500, 1, 0.001, 0.0005, (30, 30))
 toc = time.time()
 print('Overall time: ', round(toc - tic, 2))
