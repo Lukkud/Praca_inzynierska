@@ -10,7 +10,7 @@ from CF_utils import CFutils
 np.seterr(divide='ignore', invalid='ignore')
 DIR_PATH = Path(os.path.abspath(__file__)).parents[0]
 PLOT_PATH = os.path.join(DIR_PATH, 'plot_files')
-DATA_PATH = os.path.join(DIR_PATH, 'data_files')
+Path(PLOT_PATH).mkdir(parents=True, exist_ok=True)
 
 
 class CFteo(CFutils):

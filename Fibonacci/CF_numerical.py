@@ -1,17 +1,8 @@
-import os
-import sys
 import numpy as np
 import pandas as pd
-from pathlib import Path
 import time
-from CF_generator import cf_transform, cf_projection
 from CF_utils import CFutils
 from numba import jit
-
-
-DIR_PATH = Path(os.path.abspath(__file__)).parents[0]
-DATA_PATH = os.path.join(DIR_PATH, 'data_files')
-Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
 
 
 class CFnum(CFutils):
@@ -33,14 +24,7 @@ class CFnum(CFutils):
         self.df_p = None
 
     def execute(self):
-        if self.func == 1:
-            self.fibonacci_sequence = cf_transform(self.at)
-            self.fibonacci_sequence.to_csv(os.path.join(DATA_PATH, 'fibo_transform.csv'))
-        elif self.func == 2:
-            self.fibonacci_sequence = cf_projection(self.at)
-            self.fibonacci_sequence.to_csv(os.path.join(DATA_PATH, 'fibo_projection.csv'))
-        else:
-            raise Exception('Choose 1 to use cf_transform or 2 to use cf_projection')
+        self.fibonacci_sequence = self.choose_generator_function(self.func, self.at)
 
         print('Preparing k part')
         self.tictoc.append(time.time())
@@ -69,10 +53,6 @@ class CFnum(CFutils):
         self.saving_data(self.df_p, 'cf_numerical_p_data.xlsx')
         self.plotting_p(self.df_p, 'u', 'inv_fourier', 'CF_numerical_p.png')
         self.tictoc.append(time.time())
-        print('Done')
-        print('Time first (k) part: ', round(self.tictoc[1] - self.tictoc[0], 2))
-        print('Time second (w) part: ', round(self.tictoc[2] - self.tictoc[1], 2))
-        print('Time third (p) part: ', round(self.tictoc[3] - self.tictoc[2], 2))
 
     @staticmethod
     @jit(nopython=True)
@@ -124,9 +104,12 @@ class CFnum(CFutils):
         print("R:", 100 * abs(iw_fou_teo - iw_fou_num).sum() / sum(iw_fou_teo))
         self.compare_plots(iw_fou_teo, iw_fou_num)
 
+
 if __name__ == "__main__":
-    tic = time.time()
     x = CFnum(500, 1, 0.01, 0.001, (30, 30))
     x.execute()
-    toc = time.time()
-    print('Overall time: ', round(toc - tic, 2))
+    print('Done')
+    print('Time first (k) part: ', round(x.tictoc[1] - x.tictoc[0], 2))
+    print('Time second (w) part: ', round(x.tictoc[2] - x.tictoc[1], 2))
+    print('Time third (p) part: ', round(x.tictoc[3] - x.tictoc[2], 2))
+    print('Overall time: ', round(x.tictoc[3] - x.tictoc[0], 2))

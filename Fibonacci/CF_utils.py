@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from pathlib import Path
 import os
+from CF_generator import cf_transform, cf_projection
 
 
 DIR_PATH = Path(os.path.abspath(__file__)).parents[0]
@@ -11,6 +12,19 @@ Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
 
 
 class CFutils:
+    @staticmethod
+    def choose_generator_function(func, at):
+        if func == 1:
+            df = cf_transform(at)
+            df.to_csv(os.path.join(DATA_PATH, 'fibo_transform.csv'))
+            return df
+        elif func == 2:
+            df = cf_projection(at)
+            df.to_csv(os.path.join(DATA_PATH, 'fibo_projection.csv'))
+            return df
+        else:
+            raise Exception('Choose 1 to use cf_transform or 2 to use cf_projection')
+
     @staticmethod
     def saving_data(df, file_name):
         df = df.round(6)
