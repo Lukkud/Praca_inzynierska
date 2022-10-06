@@ -21,31 +21,38 @@ class CFnum(CFutils):
         self.k0 = 2 * np.pi * self.tau ** 2 / (1 + self.tau ** 2)
         self.q0 = self.k0 / self.tau
         self.k1 = 5 ** 0.5 * self.k0
+        self.func = func
         self.step = step
         self.eps = eps
         self.n_range = tup_range[0]
         self.m_range = tup_range[1]
         self.tictoc = []
+        self.fibonacci_sequence = None
+        self.df_k = None
+        self.df_w = None
+        self.df_p = None
 
-        if func == 1:
-            self.fibonacci_str = cf_transform(self.at)
-            self.fibonacci_str.to_csv(os.path.join(DATA_PATH, 'fibo_transform.csv'))
-        elif func == 2:
-            self.fibonacci_str = cf_projection(self.at)
-            self.fibonacci_str.to_csv(os.path.join(DATA_PATH, 'fibo_projection.csv'))
+    def execute(self):
+        if self.func == 1:
+            self.fibonacci_sequence = cf_transform(self.at)
+            self.fibonacci_sequence.to_csv(os.path.join(DATA_PATH, 'fibo_transform.csv'))
+        elif self.func == 2:
+            self.fibonacci_sequence = cf_projection(self.at)
+            self.fibonacci_sequence.to_csv(os.path.join(DATA_PATH, 'fibo_projection.csv'))
         else:
-            print('Choose 1 to use cf_transform or 2 to use cf_projection')
-            sys.exit(0)
+            raise Exception('Choose 1 to use cf_transform or 2 to use cf_projection')
 
         print('Preparing k part')
         self.tictoc.append(time.time())
         self.df_k = pd.DataFrame({'k': np.arange(0, 100, self.step), 'fourier': np.nan, 'int_fourier': np.nan})
         # Much slower solution
         # self.df_k['fourier'] = self.df_k.apply(lambda row: np.sum([complex(np.cos(row['k'] * x), np.sin(row['k'] * x)) for x in self.fibonacci_str['string']]), axis=1)
-        self.df_k['fourier'] = self.fourier(self.df_k['k'].values, self.fibonacci_str['string'].values)
+        self.df_k['fourier'] = self.fourier(self.df_k['k'].values, self.fibonacci_sequence['string'].values)
         self.df_k['int_fourier'] = np.absolute(self.df_k['fourier']) ** 2
         self.saving_data(self.df_k, 'cf_numerical_k_data.xlsx')
-        self.plotting_k(self.df_k)
+        self.plotting_k(self.df_k['k'].loc[self.df_k['int_fourier'] > 0.001],
+                        self.df_k['int_fourier'].loc[self.df_k['int_fourier'] > 0.001],
+                        'CF_numerical_k.png')
 
         print('Comparing models')
         self.compare()
@@ -53,14 +60,14 @@ class CFnum(CFutils):
         print('Preparing w part')
         self.tictoc.append(time.time())
         self.df_w = self.prepare_w(self.df_k)
-        CFnum.saving_data(self.df_w, 'cf_numerical_w_data.xlsx')
-        CFnum.plotting_w(self.df_w)
+        self.saving_data(self.df_w, 'cf_numerical_w_data.xlsx')
+        self.plotting_w(self.df_w, 'w', 'int_fourier', 'CF_numerical_w.png')
 
         print('Preparing p part')
         self.tictoc.append(time.time())
         self.df_p = self.inv_fourier()
-        CFnum.saving_data(self.df_p, 'cf_numerical_p_data.xlsx')
-        CFnum.plotting_p(self.df_p)
+        self.saving_data(self.df_p, 'cf_numerical_p_data.xlsx')
+        self.plotting_p(self.df_p, 'u', 'inv_fourier', 'CF_numerical_p.png')
         self.tictoc.append(time.time())
         print('Done')
         print('Time first (k) part: ', round(self.tictoc[1] - self.tictoc[0], 2))
