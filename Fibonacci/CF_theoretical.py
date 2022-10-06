@@ -1,9 +1,10 @@
 import numpy as np
+import os
+import time
 import matplotlib.pyplot as plt
 import pandas as pd
 from pathlib import Path
-import os
-import time
+from CF_utils import CFutils
 
 
 np.seterr(divide='ignore', invalid='ignore')
@@ -12,26 +13,28 @@ PLOT_PATH = os.path.join(DIR_PATH, 'plot_files')
 DATA_PATH = os.path.join(DIR_PATH, 'data_files')
 
 
-class CFteo:
-    def __init__(self, n, m, csv_data=1, plotting=(1, 1, 1), inv_fou=1):
+class CFteo(CFutils):
+    def __init__(self, n, m, save_file=True, plot_group_k=True, plot_k=True, plot_w=True,  inv_fou=True):
         self.tau = (1 + np.sqrt(5)) * 0.5
         self.k0 = 2 * np.pi * self.tau ** 2 / (1 + self.tau ** 2)
         self.q0 = self.k0 / self.tau
         self.k1 = 5 ** 0.5 * self.k0
         self.n_range = n
         self.m_range = m
-
-        self.plotting = plotting
+        self.save_file = save_file
+        self.plot_group_k = plot_group_k
+        self.plot_k = plot_k
+        self.plot_w = plot_w
         self.inv_fou = inv_fou
-        self.csv_data = csv_data
+        self.df = None
 
-    def scheduler(self):
-        df = self.calculating()
-        CFteo.saving_data(df) if self.csv_data else 0
-        self.plotting_group_k(df) if self.plotting[0] else 0
-        CFteo.plotting_k(df) if self.plotting[1] else 0
-        CFteo.plotting_w(df) if self.plotting[2] else 0
-        self.inv_fourier(df) if self.inv_fou else 0
+    def execute(self):
+        self.df = self.calculating()
+        self.saving_data(self.df, 'cf_theoretical_values.xlsx') if self.save_file else None
+        self.plotting_group_k(self.df) if self.plot_group_k else 0
+        self.plotting_k(self.df['k'], self.df['I(w)'], 'CF_theoretical_k.png') if self.plot_k else None
+        self.plotting_w(self.df, 'w', 'I(w)', 'CF_theoretical_w.png') if self.plot_w else None
+        self.inv_fourier(self.df) if self.inv_fou else None
 
     def calculating(self):
         num_lst = [[n, m] for n in range(self.n_range) for m in range(self.m_range)]
@@ -43,11 +46,6 @@ class CFteo:
         df['F(w)'] = np.where(df['chi'] != 0, np.sin(df['chi']) / df['chi'], 1)
         df['I(w)'] = np.where(df['chi'] != 0, abs(np.sin(df['chi']) / df['chi']) ** 2, 1)
         return df
-
-    @staticmethod
-    def saving_data(df):
-        df = df.round(6)
-        df.to_excel(os.path.join(DATA_PATH, 'cf_theoretical_values.xlsx'))
 
     def plotting_group_k(self, df):
         k_i = np.reshape(df['k'].tolist(), (self.m_range, self.n_range)).T
@@ -69,53 +67,21 @@ class CFteo:
         plt.savefig(os.path.join(PLOT_PATH, 'CF_theoretical_k_group.png'), format='png')
         plt.show()
 
-    @staticmethod
-    def plotting_k(df):
-        plt.rcParams.update({'font.size': 22})
-        plt.figure(figsize=(15, 10))
-        plt.bar(df['k'].tolist(), df['I(w)'].tolist(), width=0.3, color='black')
-        plt.axis([-2, 50, -0.05, 1.05])
-        plt.xlabel(r"$k$")
-        plt.ylabel(r"$I(k)$")
-        plt.grid(True)
-        plt.savefig(os.path.join(PLOT_PATH, 'CF_theoretical_k.png'), format='png')
-        plt.show()
-
-    @staticmethod
-    def plotting_w(df):
-        df = df.sort_values('w')
-        plt.rcParams.update({'font.size': 22})
-        plt.figure(figsize=(15, 10))
-        plt.plot(df['w'].tolist(), df['I(w)'].tolist(), "-", color="black")
-        plt.axis([-60, 60, -0.05, 1.05])
-        plt.xlabel(r"$w$")
-        plt.ylabel(r"$I(w)$")
-        plt.grid(True)
-        plt.savefig(os.path.join(PLOT_PATH, 'CF_theoretical_w.png'), format='png')
-        plt.show()
-
     def inv_fourier(self, df):
         u = np.arange(-1, 1, 0.001)
         inv_df = pd.DataFrame({'u': u, 'F(u)': np.nan})
         df = df.sort_values('w')
-
         for ui in range(len(inv_df)):
             df['tmp_feuw'] = df['F(w)'] * (np.cos(inv_df['u'].iloc[ui] * df['w']) -
                                            1j * np.sin(inv_df['u'].iloc[ui] * df['w']))
             inv_df.loc[ui, 'F(u)'] = df['tmp_feuw'].sum() / (self.n_range - 1)
 
-        plt.rcParams.update({'font.size': 22})
-        plt.figure(figsize=(15, 10))
-        plt.plot(inv_df['u'].tolist(), inv_df['F(u)'].tolist(), "-", color="black")
-        plt.xlabel(r"$u$")
-        plt.ylabel(r"$P(u)$")
-        plt.grid(True)
-        plt.savefig(os.path.join(PLOT_PATH, 'CF_theoretical_p_fourier.png'), format='png')
-        plt.show()
+        self.plotting_p(inv_df, 'u', 'F(u)', 'CF_theoretical_p_fourier.png')
 
 
-tic = time.time()
-x = CFteo(100, 100, 0, (0, 0, 0), 1)
-x.scheduler()
-toc = time.time()
-print(toc - tic)
+if __name__ == "__main__":
+    tic = time.time()
+    x = CFteo(50, 50)
+    x.execute()
+    toc = time.time()
+    print('Overall time: ', round(toc - tic, 2))
