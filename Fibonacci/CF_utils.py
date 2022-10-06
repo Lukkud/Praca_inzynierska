@@ -1,6 +1,4 @@
-import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 from pathlib import Path
 import os
 
@@ -19,41 +17,39 @@ class CFutils:
         df.to_excel(os.path.join(DATA_PATH, file_name), index=False)
 
     @staticmethod
-    def plotting_k(df):
+    def plotting_k(x, y, file_name):
         plt.rcParams.update({'font.size': 22})
         plt.figure(figsize=(15, 10))
-        plt.bar(df['k'].loc[df['int_fourier'] > 0.001], df['int_fourier'].loc[df['int_fourier'] > 0.001],
-                color="black",
-                width=0.3)
+        plt.bar(x, y, color="black", width=0.3)
         plt.axis([-2, 50, -0.05, 1.05])
         plt.xlabel(r"$k$")
         plt.ylabel(r"$I(k)$")
         plt.grid(True)
-        plt.savefig(os.path.join(PLOT_PATH, 'CF_numerical_k.png'), format='png')
+        plt.savefig(os.path.join(PLOT_PATH, file_name), format='png')
         plt.show()
 
     @staticmethod
-    def plotting_w(df):
+    def plotting_w(df, x_col_name, y_col_name, file_name):
         df = df.sort_values(by='w')
         plt.rcParams.update({'font.size': 22})
         plt.figure(figsize=(15, 10))
-        plt.plot(df['w'], df['int_fourier'], "-", color="black", linewidth=3)
+        plt.plot(df[x_col_name], df[y_col_name], "-", color="black", linewidth=3)
         plt.axis([-60, 60, -0.05, 1.05])
         plt.xlabel(r"$w$")
         plt.ylabel(r"$I(w)$")
         plt.grid(True)
-        plt.savefig(os.path.join(PLOT_PATH, 'CF_numerical_w.png'), format='png')
+        plt.savefig(os.path.join(PLOT_PATH, file_name), format='png')
         plt.show()
 
     @staticmethod
-    def plotting_p(df):
+    def plotting_p(df, x_col_name, y_col_name, file_name):
         plt.rcParams.update({'font.size': 22})
         plt.figure(figsize=(15, 10))
-        plt.plot(df['u'], df['inv_fourier'], "-", color="black", linewidth=3)
+        plt.plot(df[x_col_name], df[y_col_name], "-", color="black", linewidth=3)
         plt.xlabel(r"$u$")
         plt.ylabel(r"$P(u)$")
         plt.grid(True)
-        plt.savefig(os.path.join(PLOT_PATH, 'CF_numerical_p.png'), format='png')
+        plt.savefig(os.path.join(PLOT_PATH, file_name), format='png')
         plt.show()
 
     @staticmethod
