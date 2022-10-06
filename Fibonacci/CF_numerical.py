@@ -124,8 +124,9 @@ class CFnum(CFutils):
         print("R:", 100 * abs(iw_fou_teo - iw_fou_num).sum() / sum(iw_fou_teo))
         self.compare_plots(iw_fou_teo, iw_fou_num)
 
-
-tic = time.time()
-x = CFnum(500, 1, 0.001, 0.0005, (30, 30))
-toc = time.time()
-print('Overall time: ', round(toc - tic, 2))
+if __name__ == "__main__":
+    tic = time.time()
+    x = CFnum(500, 1, 0.01, 0.001, (30, 30))
+    x.execute()
+    toc = time.time()
+    print('Overall time: ', round(toc - tic, 2))

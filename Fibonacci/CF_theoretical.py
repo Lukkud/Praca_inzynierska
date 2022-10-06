@@ -29,23 +29,20 @@ class CFteo(CFutils):
         self.df = None
 
     def execute(self):
-        self.df = self.calculating()
+        num_lst = [[n, m] for n in range(self.n_range) for m in range(self.m_range)]
+        num_lst = np.array(num_lst).T
+        self.df = pd.DataFrame({'n': num_lst[0], 'm': num_lst[1]})
+        self.df['k'] = self.k0 * self.df['n'] + self.q0 * self.df['m']
+        self.df['w'] = self.k0 * self.df['n'] + (self.q0 - self.k1) * self.df['m']
+        self.df['chi'] = self.k0 * (self.df['n'] - self.tau * self.df['m']) / (2 * self.tau)
+        self.df['F(w)'] = np.where(self.df['chi'] != 0, np.sin(self.df['chi']) / self.df['chi'], 1)
+        self.df['I(w)'] = np.where(self.df['chi'] != 0, abs(np.sin(self.df['chi']) / self.df['chi']) ** 2, 1)
+
         self.saving_data(self.df, 'cf_theoretical_values.xlsx') if self.save_file else None
         self.plotting_group_k(self.df) if self.plot_group_k else 0
         self.plotting_k(self.df['k'], self.df['I(w)'], 'CF_theoretical_k.png') if self.plot_k else None
         self.plotting_w(self.df, 'w', 'I(w)', 'CF_theoretical_w.png') if self.plot_w else None
         self.inv_fourier(self.df) if self.inv_fou else None
-
-    def calculating(self):
-        num_lst = [[n, m] for n in range(self.n_range) for m in range(self.m_range)]
-        num_lst = np.array(num_lst).T
-        df = pd.DataFrame({'n': num_lst[0], 'm': num_lst[1]})
-        df['k'] = self.k0 * df['n'] + self.q0 * df['m']
-        df['w'] = self.k0 * df['n'] + (self.q0 - self.k1) * df['m']
-        df['chi'] = self.k0 * (df['n'] - self.tau * df['m']) / (2 * self.tau)
-        df['F(w)'] = np.where(df['chi'] != 0, np.sin(df['chi']) / df['chi'], 1)
-        df['I(w)'] = np.where(df['chi'] != 0, abs(np.sin(df['chi']) / df['chi']) ** 2, 1)
-        return df
 
     def plotting_group_k(self, df):
         k_i = np.reshape(df['k'].tolist(), (self.m_range, self.n_range)).T
