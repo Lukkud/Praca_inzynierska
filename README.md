@@ -16,7 +16,7 @@ Kwazikryształy to bardzo ciekawe struktury z punktu widzenia ich budowy atomowe
 Celem pracy była analiza serii występujących w obrazach dyfrakcyjnych, na przykładzie ciągu Fibonacciego, pokrycia Penrose'a i rzeczywistej struktury dekagonalnego kwazikryształu Al-Cu-Rh. Znając rozkład obrazu dyfrakcyjnego na serie można bez użycia metod iteracyjnych odzyskać informację o fazach czynnika strukturalnego, w przypadku obrazów centralnie symetrycznych. Przy każdym przejściu przez 0 zredukowana obwiednia pików dyfrakcyjnych oznacza zmianę fazy 0 &leftrightarrow; &pi; dla odpowiedniej grupy pików. Odzyskanie fazy czynnika strukturalnego z danych dyfrakcyjnych jest poważnym zagadnieniem. Do jej odtworzenia wykorzystuje się m.in. metody: analizę Pattersona, <i>charge flipping</i> oraz <i>low density elimination</i>. Metody te są metodami iteracyjnymi, które zazwyczaj są czasochłonne i obciążone błędami numerycznymi. Założeniem metody opisanej w tej pracy jest alternatywny sposób odzyskania faz wprost z obrazów dyfrakcyjnych.
 
 ## Technologie 
-* Python 3.6 (użyte biblioteki: Numpy, Matplotlib, Numba)
+* Python 3.9 (użyte biblioteki: Numpy, Matplotlib, Numba)
 * Matlab R2018b
 * Origin
 
