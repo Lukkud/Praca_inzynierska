@@ -20,13 +20,12 @@ Celem pracy była analiza serii występujących w obrazach dyfrakcyjnych, na prz
 * Matlab R2018b
 * Origin
 
-## Funkcje
-
 ## Uruchamianie
 
-## Obrazy
-
 ## Wyniki
+Wszystkie wyniki zostały zebrane w pracy inżynierskiej dostępnej pod poniższym adresem
+
+[Praca inżynierska](https://github.com/Lukkud/Praca_inzynierska/blob/master/Praca_inzynierska.pdf)
 
 ## Status
 Projekt zakończony
