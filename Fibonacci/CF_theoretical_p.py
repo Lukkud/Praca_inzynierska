@@ -5,13 +5,18 @@ from CF_utils import CFutils
 
 
 class CFteostat(CFutils):
-    def __init__(self, at, func, bins=250):
+    def __init__(self):
+        try:
+            self.config = self.read_json()['cf_theoretical_p']
+            self.at = self.config['at']
+            self.func = self.config['func']
+            self.bins = self.config['bins']
+        except KeyError as exc:
+            raise Exception(f"No parameter {exc} specified for CF_theoretical_p script in config.json file")
+
         self.tau = (1 + np.sqrt(5)) * 0.5
         self.k0 = 2 * np.pi * self.tau ** 2 / (1 + self.tau ** 2)
         self.net_const = 2 * np.pi / self.k0
-        self.at = at
-        self.func = func
-        self.bins = bins
         self.fibonacci_sequence = None
         self.df = None
 
@@ -32,7 +37,7 @@ class CFteostat(CFutils):
 
 if __name__ == "__main__":
     tic = time.time()
-    x = CFteostat(5000, 1, 250)
+    x = CFteostat()
     x.execute()
     toc = time.time()
     print('Overall time: ', round(toc - tic, 2))

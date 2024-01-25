@@ -14,18 +14,23 @@ Path(PLOT_PATH).mkdir(parents=True, exist_ok=True)
 
 
 class CFteo(CFutils):
-    def __init__(self, n, m, save_file=True, plot_group_k=True, plot_k=True, plot_w=True,  inv_fou=True):
+    def __init__(self):
+        try:
+            self.config = self.read_json()['cf_theoretical']
+            self.n_range = self.config['n']
+            self.m_range = self.config['m']
+            self.save_file = self.config['save_file']
+            self.plot_group_k = self.config['plot_group_k']
+            self.plot_k = self.config['plot_k']
+            self.plot_w = self.config['plot_w']
+            self.inv_fou = self.config['inv_fou']
+        except KeyError as exc:
+            raise Exception(f"No parameter {exc} specified for CF_theoretical script in config.json file")
+
         self.tau = (1 + np.sqrt(5)) * 0.5
         self.k0 = 2 * np.pi * self.tau ** 2 / (1 + self.tau ** 2)
         self.q0 = self.k0 / self.tau
         self.k1 = 5 ** 0.5 * self.k0
-        self.n_range = n
-        self.m_range = m
-        self.save_file = save_file
-        self.plot_group_k = plot_group_k
-        self.plot_k = plot_k
-        self.plot_w = plot_w
-        self.inv_fou = inv_fou
         self.df = None
 
     def execute(self):
@@ -78,7 +83,7 @@ class CFteo(CFutils):
 
 if __name__ == "__main__":
     tic = time.time()
-    x = CFteo(50, 50)
+    x = CFteo()
     x.execute()
     toc = time.time()
     print('Overall time: ', round(toc - tic, 2))

@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import os
 from CF_generator import cf_transform, cf_projection
+import json
 
 
 DIR_PATH = Path(os.path.abspath(__file__)).parents[0]
@@ -12,6 +13,12 @@ Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
 
 
 class CFutils:
+    def read_json(self):
+        f = open(os.path.join(DIR_PATH, "config.json"))
+        config = json.load(f)
+        f.close()
+        return config
+
     @staticmethod
     def choose_generator_function(func, at):
         if func == 1:

@@ -1,0 +1,20 @@
+{
+  "cf_numerical": {"at": 500,
+                   "func": 1,
+                   "step": 0.01,
+                   "eps": 0.001,
+                   "tup_range": [30, 30]
+  },
+  "cf_theoretical": {"n": 50,
+                     "m": 50,
+                     "save_file": true,
+                     "plot_group_k": true,
+                     "plot_k": true,
+                     "plot_w": true,
+                     "inv_fou": true
+  },
+  "cf_theoretical_p": {"at": 5000,
+                       "func": 1,
+                       "bins": 250
+  }
+}

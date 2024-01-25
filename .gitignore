@@ -135,3 +135,7 @@ Fibonacci/plot_files
 Fibonacci/data_files
 .Fibonacci.data_files
 .Fibonacci.plot_files
+Penrose/plot_files
+Penrose/data_files
+.Penrose.data_files
+.Penrose.plot_files

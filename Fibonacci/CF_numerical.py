@@ -6,17 +6,22 @@ from numba import jit
 
 
 class CFnum(CFutils):
-    def __init__(self, at, func, step, eps, tup_range):
-        self.at = at
+    def __init__(self):
+        try:
+            self.config = self.read_json()['cf_numerical']
+            self.at = self.config['at']
+            self.func = self.config['func']
+            self.step = self.config['step']
+            self.eps = self.config['eps']
+            self.n_range = self.config['tup_range'][0]
+            self.m_range = self.config['tup_range'][1]
+        except KeyError as exc:
+            raise Exception(f"No parameter {exc} specified for CF_numerical script in config.json file")
+
         self.tau = (1 + np.sqrt(5)) * 0.5
         self.k0 = 2 * np.pi * self.tau ** 2 / (1 + self.tau ** 2)
         self.q0 = self.k0 / self.tau
         self.k1 = 5 ** 0.5 * self.k0
-        self.func = func
-        self.step = step
-        self.eps = eps
-        self.n_range = tup_range[0]
-        self.m_range = tup_range[1]
         self.tictoc = []
         self.fibonacci_sequence = None
         self.df_k = None
@@ -106,7 +111,7 @@ class CFnum(CFutils):
 
 
 if __name__ == "__main__":
-    x = CFnum(500, 1, 0.01, 0.001, (30, 30))
+    x = CFnum()
     x.execute()
     print('Done')
     print('Time first (k) part: ', round(x.tictoc[1] - x.tictoc[0], 2))
