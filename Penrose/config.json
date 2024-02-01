@@ -1,0 +1,9 @@
+{
+  "d2_numerical_k": {"kx_range": 100,
+                     "ky_range": 100,
+                     "kx_step": 0.1,
+                     "ky_step": 0.1,
+                     "source_file": "Penrose2300pkt.txt",
+                     "threshold": 0.01
+  }
+}
