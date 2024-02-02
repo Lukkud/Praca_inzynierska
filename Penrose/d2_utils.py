@@ -22,9 +22,14 @@ class D2utils:
         return config
 
     @staticmethod
-    def saving_data(df, file_name):
+    def saving_data_excel(df, file_name):
         df = df.round(6)
         df.to_excel(os.path.join(DATA_PATH, file_name), index=False)
+
+    @staticmethod
+    def saving_data_csv(df, file_name):
+        df = df.round(6)
+        df.to_csv(os.path.join(DATA_PATH, file_name), index=False)
 
     @staticmethod
     def read_source_data(file_name):
@@ -33,7 +38,7 @@ class D2utils:
         return df
 
     @staticmethod
-    def plotting_k_numerical_penrose(df, file_name, threshold):
+    def plotting_k_penrose(df, file_name, threshold):
         df = df.loc[df["iw_fou"] > threshold]
         plt.rcParams.update({'font.size': 16})
         fig = plt.figure(figsize=(15, 10))

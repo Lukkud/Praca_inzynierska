@@ -2,12 +2,7 @@ import numpy as np
 import pandas as pd
 import time
 import numba as nb
-from pathlib import Path
-import os
 from d2_utils import D2utils
-
-DIR_PATH = Path(os.path.abspath(__file__)).parents[0]
-SOURCE_PATH = os.path.join(DIR_PATH, 'Source')
 
 
 class D2num(D2utils):
@@ -46,8 +41,8 @@ class D2num(D2utils):
         k1, k2, fou, iw_fou = self.fourier_2d(self.kx, self.ky, self.df_pen.to_numpy())
         k1, k2, iw_fou, fou = zip(*sorted(zip(k1, k2, iw_fou, fou)))
         df_output = pd.DataFrame({"k1": k1, "k2": k2, "iw_fou": iw_fou, "fou": fou})
-        self.saving_data(df_output, 'd2_numerical.xlsx')
-        self.plotting_k_numerical_penrose(df_output, 'Penrose_plot_k_scatter', self.threshold)
+        self.saving_data_csv(df_output, 'd2_numerical.csv')
+        self.plotting_k_penrose(df_output, 'Penrose_plot_k_num', self.threshold)
 
 
 if __name__ == "__main__":

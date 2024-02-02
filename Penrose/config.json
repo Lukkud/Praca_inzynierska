@@ -5,5 +5,13 @@
                      "ky_step": 0.1,
                      "source_file": "Penrose2300pkt.txt",
                      "threshold": 0.01
+  },
+  "d2_hybrid_k": {"a": 1,
+                  "n01_range": 10,
+                  "n02_range": 10,
+                  "m01_range": 10,
+                  "m02_range": 10,
+                  "source_file": "Penrose2300pkt.txt",
+                  "threshold": 0.01
   }
 }
