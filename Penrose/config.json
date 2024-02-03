@@ -13,5 +13,10 @@
                   "m02_range": 10,
                   "source_file": "Penrose2300pkt.txt",
                   "threshold": 0.01
+  },
+  "d2_hybrid_w": {"source_file": "d2_hybrid_k.csv",
+                  "threshold": 0.01,
+                  "border_1": 0.48,
+                  "border_2": 1
   }
 }
