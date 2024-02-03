@@ -42,7 +42,7 @@ class D2num(D2utils):
         k1, k2, iw_fou, fou = zip(*sorted(zip(k1, k2, iw_fou, fou)))
         df_output = pd.DataFrame({"k1": k1, "k2": k2, "iw_fou": iw_fou, "fou": fou})
         self.saving_data_csv(df_output, 'd2_numerical.csv')
-        self.plotting_k_penrose(df_output, 'Penrose_plot_k_num', self.threshold)
+        self.plotting_k(df_output, 'Penrose_plot_k_num', self.threshold)
 
 
 if __name__ == "__main__":

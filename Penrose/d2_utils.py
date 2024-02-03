@@ -38,28 +38,7 @@ class D2utils:
         return df
 
     @staticmethod
-    def plotting_k_penrose(df, file_name, threshold):
-        df = df.loc[df["iw_fou"] > threshold]
-        plt.rcParams.update({'font.size': 16})
-        fig = plt.figure(figsize=(15, 10))
-        ax = plt.axes(projection="3d")
-        ax.scatter3D(df.k1, df.k2, df.iw_fou, color="black")
-        ax.set_xlabel(r"$k_{x}$")
-        ax.set_ylabel(r"$k_{y}$")
-        ax.set_zlabel(r"$I(k_{x}, k_{y})$")
-        plt.grid(True)
-        ax.view_init(0, 0)
-        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_0deg.png"), format='png')
-        ax.view_init(90, 0)
-        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_90deg.png"), format='png')
-        ax.view_init(45, 0)
-        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_45deg.png"), format='png')
-        ax.view_init(15, 0)
-        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_15deg.png"), format='png')
-        plt.show()
-
-    @staticmethod
-    def plotting_w_penrose(df, file_name, threshold):
+    def plotting_k(df, file_name, threshold):
         df = df.loc[df["iw_fou"] > threshold]
         plt.rcParams.update({'font.size': 16})
         fig = plt.figure(figsize=(15, 10))
@@ -112,6 +91,27 @@ class D2utils:
         ax.set_xlabel(r"$w_{x}$")
         ax.set_ylabel(r"$w_{y}$")
         ax.set_zlabel(r"$I(w_{x}, w_{y})$")
+        plt.grid(True)
+        ax.view_init(0, 0)
+        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_0deg.png"), format='png')
+        ax.view_init(90, 0)
+        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_90deg.png"), format='png')
+        ax.view_init(45, 0)
+        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_45deg.png"), format='png')
+        ax.view_init(15, 0)
+        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_15deg.png"), format='png')
+        plt.show()
+
+    @staticmethod
+    def plotting_p(df, file_name, threshold):
+        df = df.loc[df["inv_fou"] > threshold]
+        plt.rcParams.update({'font.size': 16})
+        fig = plt.figure(figsize=(10, 10))
+        ax = plt.axes(projection='3d')
+        ax.scatter3D(df.u1, df.u2, df.inv_fou, s=2, color="black")
+        ax.set_xlabel(r"$u_{x}$")
+        ax.set_ylabel(r"$u_{y}$")
+        ax.set_zlabel(r"$P(u_{x}, u_{y})$")
         plt.grid(True)
         ax.view_init(0, 0)
         plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_0deg.png"), format='png')

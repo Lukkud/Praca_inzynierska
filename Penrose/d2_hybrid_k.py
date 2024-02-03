@@ -61,7 +61,7 @@ class D2hybridk(D2utils):
         self.df_points["iw_fou"] = iw_fou
         # self.fourier_2d_hybrid_pandas_style()
         self.saving_data_csv(self.df_points, 'd2_hybrid_k.csv')
-        self.plotting_k_penrose(self.df_points, 'Penrose_plot_k_hybrid', self.threshold)
+        self.plotting_k(self.df_points, 'Penrose_plot_k_hybrid', self.threshold)
 
 
 if __name__ == "__main__":

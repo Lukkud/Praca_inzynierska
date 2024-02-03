@@ -23,8 +23,10 @@ class D2hybridw(D2utils):
         self.df_points["phase"] = self.df_points.apply(lambda row: np.arctan(row["fou"].imag / row["fou"].real), axis=1)
         self.df_points["group"] = self.df_points.apply(lambda row: 3 if (row["phase"] > -self.border_1) and (row["phase"] < self.border_1)
                                                                      else (1 if (row["phase"] < -self.border_2) or (row["phase"] > self.border_2) else 2), axis=1)
+        self.saving_data_csv(self.df_points, 'd2_hybrid_w.csv')
         self.plotting_w_phase(self.df_points, 'Penrose_plot_w_phase.png', self.threshold, self.border_1, self.border_2)
         self.plotting_w(self.df_points, 'Penrose_plot_w_hybrid', self.threshold)
+
 
 if __name__ == "__main__":
     tic = time.time()
@@ -32,5 +34,3 @@ if __name__ == "__main__":
     x.execute()
     toc = time.time()
     print('Overall time: ', round(toc - tic, 2))
-
-
