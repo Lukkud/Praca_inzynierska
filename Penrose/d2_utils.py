@@ -52,10 +52,6 @@ class D2utils:
         plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_0deg.png"), format='png')
         ax.view_init(90, 0)
         plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_90deg.png"), format='png')
-        ax.view_init(45, 0)
-        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_45deg.png"), format='png')
-        ax.view_init(15, 0)
-        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_15deg.png"), format='png')
         plt.show()
 
     @staticmethod
@@ -96,10 +92,29 @@ class D2utils:
         plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_0deg.png"), format='png')
         ax.view_init(90, 0)
         plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_90deg.png"), format='png')
-        ax.view_init(45, 0)
-        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_45deg.png"), format='png')
-        ax.view_init(15, 0)
-        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_15deg.png"), format='png')
+        plt.show()
+
+    @staticmethod
+    def plotting_w_group(df, file_name, threshold):
+        df = df.loc[df["iw_fou"] > threshold]
+        df_group_1 = df.loc[df["group"] == 1]
+        df_group_2 = df.loc[df["group"] == 2]
+        df_group_3 = df.loc[df["group"] == 3]
+
+        plt.rcParams.update({'font.size': 16})
+        fig = plt.figure(figsize=(10, 10))
+        ax = plt.axes(projection='3d')
+        ax.scatter3D(df_group_1.w1, df_group_1.w2, df_group_1.iw_fou, s=2, color=(0.1, 0.9, 0.1))
+        ax.scatter3D(df_group_2.w1, df_group_2.w2, df_group_2.iw_fou, s=2, color="red")
+        ax.scatter3D(df_group_3.w1, df_group_3.w2, df_group_3.iw_fou, s=2, color="blue")
+        ax.set_xlabel(r"$w_{x}$")
+        ax.set_ylabel(r"$w_{y}$")
+        ax.set_zlabel(r"$I(w_{x}, w_{y})$")
+        plt.grid(True)
+        ax.view_init(0, 0)
+        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_0deg.png"), format='png')
+        ax.view_init(90, 0)
+        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_90deg.png"), format='png')
         plt.show()
 
     @staticmethod
@@ -117,8 +132,21 @@ class D2utils:
         plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_0deg.png"), format='png')
         ax.view_init(90, 0)
         plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_90deg.png"), format='png')
-        ax.view_init(45, 0)
-        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_45deg.png"), format='png')
-        ax.view_init(15, 0)
-        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}_15deg.png"), format='png')
+        plt.show()
+
+    @staticmethod
+    def plotting_p_group(df, file_name, threshold):
+        # df = df.loc[df["inv_fou_group_3"] > threshold]
+        plt.rcParams.update({'font.size': 16})
+        fig = plt.figure(figsize=(10, 10))
+        ax = plt.axes(projection='3d')
+        ax.scatter3D(df.u1, df.u2, df.inv_fou_group_1, s=2, color="red")
+        ax.scatter3D(df.u1, df.u2, df.inv_fou_group_2, s=2, color="green")
+        ax.scatter3D(df.u1, df.u2, df.inv_fou_group_3, s=2, color="blue")
+        ax.set_xlabel(r"$u_{x}$")
+        ax.set_ylabel(r"$u_{y}$")
+        ax.set_zlabel(r"$P(u_{x}, u_{y})$")
+        plt.grid(True)
+        ax.view_init(0, 0)
+        plt.savefig(os.path.join(PLOT_PATH, f"{file_name}.png"), format='png')
         plt.show()

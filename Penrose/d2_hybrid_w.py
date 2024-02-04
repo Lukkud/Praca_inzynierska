@@ -26,6 +26,7 @@ class D2hybridw(D2utils):
         self.saving_data_csv(self.df_points, 'd2_hybrid_w.csv')
         self.plotting_w_phase(self.df_points, 'Penrose_plot_w_phase.png', self.threshold, self.border_1, self.border_2)
         self.plotting_w(self.df_points, 'Penrose_plot_w_hybrid', self.threshold)
+        self.plotting_w_group(self.df_points, 'Penrose_plot_w_hybrid_group', self.threshold)
 
 
 if __name__ == "__main__":

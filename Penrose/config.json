@@ -21,8 +21,8 @@
   },
   "d2_hybrid_p": {"ux_range": 20,
                   "uy_range": 20,
-                  "ux_step": 0.5,
-                  "uy_step": 0.5,
+                  "ux_step": 0.1,
+                  "uy_step": 0.1,
                   "source_file": "d2_hybrid_w.csv",
                   "threshold": 0.1
   }
